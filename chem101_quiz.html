@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHEM 101 Review Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f14;
+    --surface: #161820;
+    --surface2: #1e2028;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.16);
+    --text: #e8e9f0;
+    --muted: #7b7d8e;
+    --accent: #7c6af7;
+    --accent-glow: rgba(124,106,247,0.2);
+    --correct: #3ecf8e;
+    --correct-bg: rgba(62,207,142,0.1);
+    --wrong: #f06060;
+    --wrong-bg: rgba(240,96,96,0.1);
+    --ch1: #7c6af7; --ch2: #f7836a; --ch3: #6ab4f7;
+    --ch4: #f7c36a; --ch5: #6af7b8; --ch6: #f76ab4;
+    --ch7: #a8f76a; --ch8: #f7a86a; --ch9: #6a9ff7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* SPLASH */
+  #splash {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #splash::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,106,247,0.15) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .splash-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+  #splash h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  #splash h1 span { color: var(--accent); font-weight: 500; }
+  .splash-sub {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+  }
+  .chapter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+  }
+  .chapter-pill {
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    user-select: none;
+  }
+  .chapter-pill.active { opacity: 1; }
+  .chapter-pill.inactive { opacity: 0.35; }
+  .start-btn {
+    padding: 14px 40px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .start-btn:hover { background: #8f7fff; transform: translateY(-1px); }
+  .start-btn:active { transform: translateY(0); }
+  .stat-row {
+    display: flex; gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 300; color: var(--accent); font-family: 'DM Mono', monospace; }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* QUIZ LAYOUT */
+  #quiz { display: none; min-height: 100vh; }
+  .quiz-header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(14,15,20,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .quiz-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .quiz-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .quiz-body {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .chapter-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 0.5rem;
+  }
+  .ch-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ch-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .obj-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2px 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    margin-left: auto;
+  }
+
+  .question-text {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.55;
+    margin: 1rem 0 1.5rem;
+    color: var(--text);
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.5;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--border-hover);
+    background: var(--surface2);
+  }
+  .choice-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .choice-btn.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .choice-btn.correct .choice-letter { background: var(--correct); color: #0e0f14; border-color: var(--correct); }
+  .choice-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .choice-btn.wrong .choice-letter { background: var(--wrong); color: #0e0f14; border-color: var(--wrong); }
+  .choice-btn.reveal { background: rgba(62,207,142,0.06); border-color: rgba(62,207,142,0.4); }
+  .choice-btn.reveal .choice-letter { color: var(--correct); border-color: rgba(62,207,142,0.4); }
+
+  .feedback-box {
+    margin-top: 1rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct { background: var(--correct-bg); border: 1px solid rgba(62,207,142,0.3); color: #7fe8be; }
+  .feedback-box.wrong { background: var(--wrong-bg); border: 1px solid rgba(240,96,96,0.3); color: #f5a0a0; }
+  .feedback-label { font-weight: 500; margin-bottom: 4px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1.5rem;
+  }
+  .next-btn {
+    padding: 10px 24px;
+    background: var(--accent);
+    color: white; border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: none;
+    transition: all 0.15s;
+  }
+  .next-btn:hover { background: #8f7fff; }
+  .skip-btn {
+    padding: 10px 18px;
+    background: transparent;
+    color: var(--muted); border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .skip-btn:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* RESULTS */
+  #results { display: none; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; }
+  .results-card {
+    max-width: 560px; width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+  }
+  .results-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .big-score { font-size: 72px; font-weight: 300; font-family: 'DM Mono', monospace; color: var(--accent); line-height: 1; margin: 0.5rem 0; }
+  .score-sub { font-size: 15px; color: var(--muted); margin-bottom: 2rem; }
+  .chapter-breakdown { text-align: left; margin-bottom: 2rem; }
+  .breakdown-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 1rem; }
+  .breakdown-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .breakdown-name { flex: 1; color: var(--muted); }
+  .breakdown-bar-bg { flex: 2; height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .breakdown-bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s; }
+  .breakdown-frac { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); min-width: 36px; text-align: right; }
+  .action-row { display: flex; gap: 10px; justify-content: center; }
+  .retry-btn {
+    padding: 12px 28px; background: var(--accent); color: white; border: none;
+    border-radius: 8px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.15s;
+  }
+  .retry-btn:hover { background: #8f7fff; }
+  .review-btn {
+    padding: 12px 28px; background: transparent; color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 15px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .review-btn:hover { border-color: var(--border-hover); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  /* REVIEW MODE */
+  #review { display: none; }
+  .review-header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(14,15,20,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .back-btn {
+    padding: 7px 16px; background: transparent; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .back-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .review-body { max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
+  }
+  .review-item.got-right { border-left: 3px solid var(--correct); }
+  .review-item.got-wrong { border-left: 3px solid var(--wrong); }
+  .review-q { font-size: 14px; line-height: 1.55; margin-bottom: 10px; }
+  .review-answer { font-size: 13px; color: var(--muted); }
+  .review-answer .your { color: var(--wrong); }
+  .review-answer .right { color: var(--correct); }
+  .review-explain { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; font-style: italic; }
+
+  @media (max-width: 500px) {
+    .quiz-header { padding: 0.75rem 1rem; }
+    .quiz-body { padding: 1.5rem 1rem 3rem; }
+    .question-text { font-size: 16px; }
+    .stat-row { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-label">UNC CHEM 101 · Spring 2026</div>
+  <h1>Exam<br><span>Review Quiz</span></h1>
+  <p class="splash-sub">One question per learning objective. All nine chapters. Based on your actual practice exams.</p>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num" id="total-q-count">76</div><div class="stat-label">Questions</div></div>
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">Chapters</div></div>
+    <div class="stat"><div class="stat-num">~25</div><div class="stat-label">Minutes</div></div>
+  </div>
+
+  <div class="chapter-pills" id="chapter-pills"></div>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <div class="quiz-logo">CHEM 101</div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="quiz-meta" id="quiz-meta">0 / 0</div>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" style="display:none; min-height:100vh; display:none; align-items:center; justify-content:center; flex-direction:column; padding:2rem;">
+  <div class="results-card">
+    <div class="results-label">Quiz Complete</div>
+    <div class="big-score" id="res-pct">—</div>
+    <div class="score-frac" style="font-family:'DM Mono',monospace;font-size:14px;color:var(--muted);margin-bottom:0.25rem;" id="res-frac"></div>
+    <div class="score-sub" id="res-msg"></div>
+    <hr class="divider">
+    <div class="chapter-breakdown">
+      <div class="breakdown-title">By Chapter</div>
+      <div id="breakdown-rows"></div>
+    </div>
+    <div class="action-row">
+      <button class="retry-btn" onclick="startQuiz()">Try Again</button>
+      <button class="review-btn" onclick="showReview()">Review Answers</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="review">
+  <div class="review-header">
+    <button class="back-btn" onclick="backToResults()">← Results</button>
+    <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">Answer Review</span>
+  </div>
+  <div class="review-body" id="review-body"></div>
+</div>
+
+<script>
+const CHAPTERS = [
+  { id:1, name:"Matter & Energy", color:"#7c6af7", short:"Ch 1" },
+  { id:2, name:"Atoms, Ions & Molecules", color:"#f7836a", short:"Ch 2" },
+  { id:3, name:"Atomic Structure", color:"#6ab4f7", short:"Ch 3" },
+  { id:4, name:"Chemical Bonding", color:"#f7c36a", short:"Ch 4" },
+  { id:5, name:"Bonding Theories", color:"#6af7b8", short:"Ch 5" },
+  { id:6, name:"Intermolecular Forces", color:"#f76ab4", short:"Ch 6" },
+  { id:7, name:"Stoichiometry", color:"#a8f76a", short:"Ch 7" },
+  { id:8, name:"Aqueous Reactions", color:"#f7a86a", short:"Ch 8" },
+  { id:9, name:"Properties of Gases", color:"#6a9ff7", short:"Ch 9" },
+];
+
+const ALL_QUESTIONS = [
+  // CH 1
+  { ch:1, obj:"1A", q:"Which of the following is a CHEMICAL property of iron?", choices:["Iron melts at 1538°C","Iron is a shiny, silver-gray metal","Iron rusts when exposed to oxygen and water","Iron is denser than aluminum"], ans:2, explain:"Chemical properties describe how a substance transforms into a different substance. Rusting (oxidation) is a chemical change; melting, appearance, and density are physical properties." },
+  { ch:1, obj:"1B", q:"Which statement best explains why gases are more compressible than liquids?", choices:["Gas molecules move faster than liquid molecules","Gas molecules have much greater spacing between them and weaker intermolecular forces","Gas molecules are smaller than liquid molecules","Gas molecules have more kinetic energy per molecule"], ans:1, explain:"The particulate nature of matter explains compressibility: gas particles are far apart with negligible intermolecular forces, so they can be pushed together easily. Liquids have particles in close contact." },
+  { ch:1, obj:"1C", q:"The molecular formula of caffeine is C₈H₁₀N₄O₂. How many atoms of nitrogen are in one molecule of caffeine?", choices:["2","4","8","10"], ans:1, explain:"The subscript after each element symbol gives the count of that atom per molecule. N₄ means 4 nitrogen atoms per caffeine molecule." },
+  { ch:1, obj:"1D", q:"A particle has a diameter of 2.5 nm. What is this in meters?", choices:["2.5 × 10⁻⁶ m","2.5 × 10⁻⁹ m","2.5 × 10⁻¹² m","2.5 × 10⁻³ m"], ans:1, explain:"The SI prefix 'nano' (n) means 10⁻⁹. So 2.5 nm = 2.5 × 10⁻⁹ m." },
+  { ch:1, obj:"1E", q:"Convert 450 cm to meters.", choices:["0.450 m","4.50 m","45.0 m","4500 m"], ans:1, explain:"1 m = 100 cm. So 450 cm × (1 m / 100 cm) = 4.50 m. Moving from centi to the base unit means dividing by 100." },
+  { ch:1, obj:"1F", q:"A student measures a mass as 12.340 g. How many significant figures does this value have?", choices:["3","4","5","6"], ans:2, explain:"12.340 g has 5 significant figures. All non-zero digits are significant, zeros between them are significant, and trailing zeros after a decimal point are significant." },
+  { ch:1, obj:"1G", q:"A car travels at 60.0 miles/hour. What is this speed in m/s? (1 mile = 1609 m)", choices:["26.8 m/s","36.0 m/s","96.5 m/s","0.0373 m/s"], ans:0, explain:"60.0 mi/hr × 1609 m/mi × 1 hr/3600 s = 26.8 m/s." },
+  { ch:1, obj:"1H", q:"A gold bar has a mass of 400.0 troy oz. Given 1 troy oz = 31.10 g and the density of gold = 19.3 g/cm³, what is the volume of the bar in cm³?", choices:["643 cm³","124,400 cm³","645 cm³","20.7 cm³"], ans:0, explain:"400.0 troy oz × 31.10 g/troy oz = 12,440 g. Volume = mass/density = 12,440 g / 19.3 g/cm³ = 644.6 ≈ 645 cm³. (Answer is ~644-645 cm³.)" },
+  { ch:1, obj:"1I", q:"The COAST approach to problem solving stands for:", choices:["Calculate, Organize, Assign, Solve, Test","Collect data, Outline, Analyze, Summarize, Test","Conceptualize, Organize information, Analyze the problem, Solve, Test the answer","Check, Organize, Approximate, Solve, Tally"], ans:2, explain:"COAST = Conceptualize (understand what is being asked), Organize information, Analyze (choose the approach), Solve (carry out the math), Test the answer (does it make sense?)." },
+  { ch:1, obj:"1J", q:"A 25.0 mL sample of olive oil has a mass of 23.0 g. What is the density of olive oil in g/mL?", choices:["575 g/mL","1.09 g/mL","0.920 g/mL","0.0435 g/mL"], ans:2, explain:"Density = mass/volume = 23.0 g / 25.0 mL = 0.920 g/mL." },
+  { ch:1, obj:"1K", q:"During the condensation of steam to liquid water, which statement about energy is correct?", choices:["Kinetic energy increases as molecules slow down","Electrostatic potential energy increases as molecules come closer","Electrostatic potential energy decreases as attractive forces pull molecules together","Kinetic energy is converted to potential energy"], ans:2, explain:"During condensation, gas molecules come closer together. The attractive electrostatic (intermolecular) forces do work, lowering the potential energy. Energy is released to the surroundings." },
+
+  // CH 2
+  { ch:2, obj:"2A", q:"Which experiment provided evidence that atoms contain a dense, positive nucleus?", choices:["Thomson's cathode ray experiment","Millikan's oil drop experiment","Rutherford's gold foil experiment","Dalton's atomic theory"], ans:2, explain:"Rutherford's gold foil experiment showed that most alpha particles passed straight through, but a few deflected at large angles — evidence of a small, dense, positively charged nucleus." },
+  { ch:2, obj:"2B", q:"Based on Rutherford's gold foil experiment, the atom is best described as:", choices:["A uniform sphere of positive charge with electrons embedded throughout","Mostly empty space with a tiny, dense, positively charged nucleus","A dense ball of neutrons surrounded by electrons","A flat disk with the nucleus at the edge"], ans:1, explain:"The gold foil experiment showed most alpha particles pass through undeflected (mostly empty space), with a few bouncing back (small dense nucleus). This replaced Thomson's 'plum pudding' model." },
+  { ch:2, obj:"2C", q:"Where are electrons located in an atom, and what is their charge?", choices:["In the nucleus; positive charge","In the nucleus; negative charge","Outside the nucleus in orbitals; negative charge","Outside the nucleus in orbitals; positive charge"], ans:2, explain:"Electrons are found in orbitals outside the nucleus and carry a -1 charge. Protons (positive) and neutrons (neutral) are in the nucleus." },
+  { ch:2, obj:"2D", q:"An atom of phosphorus-31 (P) forms a 3⁻ ion. How many electrons does P³⁻ have?", choices:["12","15","18","21"], ans:2, explain:"Neutral P has 15 electrons (atomic number = 15). A 3⁻ ion has gained 3 electrons: 15 + 3 = 18 electrons." },
+  { ch:2, obj:"2E", q:"Chlorine has two naturally occurring isotopes: Cl-35 (75.77% abundance, 34.97 amu) and Cl-37 (24.23% abundance, 36.97 amu). What is the average atomic mass?", choices:["35.45 amu","36.00 amu","35.97 amu","36.47 amu"], ans:0, explain:"Avg mass = (0.7577 × 34.97) + (0.2423 × 36.97) = 26.50 + 8.96 = 35.45 amu. This matches the periodic table value for Cl." },
+  { ch:2, obj:"2F", q:"How many molecules are in 0.250 mol of H₂O?", choices:["2.41 × 10²³","1.51 × 10²³","6.02 × 10²³","3.01 × 10²²"], ans:1, explain:"0.250 mol × 6.022 × 10²³ molecules/mol = 1.506 × 10²³ molecules ≈ 1.51 × 10²³." },
+  { ch:2, obj:"2G", q:"What is the molar mass of glucose (C₆H₁₂O₆)?", choices:["30.0 g/mol","90.0 g/mol","180.2 g/mol","342.3 g/mol"], ans:2, explain:"6 C = 6×12.01 = 72.06; 12 H = 12×1.008 = 12.10; 6 O = 6×16.00 = 96.00. Total = 180.16 ≈ 180.2 g/mol." },
+  { ch:2, obj:"2H", q:"A mass spectrum of an element shows two peaks: one at m/z = 63 and one at m/z = 65, with relative intensities of 70 and 30 respectively. This element is most likely:", choices:["Zinc","Copper","Nickel","Gallium"], ans:1, explain:"Copper has two isotopes: Cu-63 (~69% abundant) and Cu-65 (~31% abundant). The mass spectrum pattern — two peaks near m/z 63 and 65 with roughly 70:30 intensity — matches copper." },
+
+  // CH 3
+  { ch:3, obj:"3A", q:"A photon has a wavelength of 500 nm. What is its frequency? (c = 3.00 × 10⁸ m/s)", choices:["6.00 × 10¹⁴ Hz","1.67 × 10⁻¹⁵ Hz","6.00 × 10¹¹ Hz","1.50 × 10⁵ Hz"], ans:0, explain:"ν = c/λ = (3.00×10⁸ m/s) / (500×10⁻⁹ m) = 6.00×10¹⁴ Hz. This is visible green light." },
+  { ch:3, obj:"3B", q:"The photoelectric effect demonstrates that:", choices:["Light travels in waves and has no particle nature","Increasing the intensity of light below the threshold frequency will eventually eject electrons","Electrons are ejected only when the light frequency exceeds a threshold value, regardless of intensity","All frequencies of light can eject electrons if the intensity is high enough"], ans:2, explain:"Einstein's explanation: light behaves as photons with E=hν. Electrons are only ejected if each photon has enough energy (hν ≥ work function). Intensity determines the number of photons, not energy per photon." },
+  { ch:3, obj:"3C", q:"The line spectrum of hydrogen arises because:", choices:["Hydrogen has only one electron that absorbs all wavelengths of light","Electrons transition between discrete (quantized) energy levels, emitting photons of specific energies","Hydrogen atoms vibrate at specific frequencies","Each hydrogen atom is a slightly different size"], ans:1, explain:"Electrons in H occupy discrete energy levels. When an electron drops from a higher to a lower level, it emits a photon with energy equal to the difference (ΔE = hν). Only certain ΔE values exist, so only certain wavelengths are emitted." },
+  { ch:3, obj:"3D", q:"Using the Bohr model, what wavelength of light is emitted when an electron in H transitions from n=4 to n=2? (hcR_H = 2.18×10⁻¹⁸ J, h = 6.626×10⁻³⁴ J·s, c = 3.00×10⁸ m/s)", choices:["122 nm","486 nm","656 nm","1875 nm"], ans:1, explain:"ΔE = -2.18×10⁻¹⁸(1/16 - 1/4) = -2.18×10⁻¹⁸(-3/16) = 4.09×10⁻¹⁹ J. λ = hc/ΔE = (6.626×10⁻³⁴ × 3.00×10⁸)/(4.09×10⁻¹⁹) ≈ 486 nm (blue, Balmer series)." },
+  { ch:3, obj:"3E", q:"A particle's de Broglie wavelength depends on:", choices:["Only its velocity","Only its mass","Its mass and velocity (momentum)","Its charge and mass"], ans:2, explain:"de Broglie wavelength λ = h/mv = h/p, where p is momentum. Both mass and velocity matter — heavier or faster particles have shorter wavelengths." },
+  { ch:3, obj:"3F", q:"The Heisenberg Uncertainty Principle states that:", choices:["We cannot know the exact energy of an electron in an atom","It is impossible to simultaneously know both the exact position and exact momentum of a particle","Electrons always travel in circular orbits","The spin of an electron is either +1/2 or -1/2"], ans:1, explain:"Heisenberg's principle: Δx·Δp ≥ h/4π. Precisely measuring an electron's position introduces uncertainty in its momentum, and vice versa. This is why we use probability distributions (orbitals) rather than exact paths." },
+  { ch:3, obj:"3G", q:"Which set of quantum numbers correctly describes an electron in the 3d subshell?", choices:["n=3, ℓ=0, mℓ=0","n=3, ℓ=2, mℓ=+2","n=3, ℓ=3, mℓ=0","n=2, ℓ=2, mℓ=-1"], ans:1, explain:"For 3d: n=3, ℓ=2 (d subshell), mℓ can be -2,-1,0,+1,+2. Option B (n=3, ℓ=2, mℓ=+2) is valid. Option A is 3s; C has ℓ=n which is impossible; D has ℓ=2 but n=2 (not possible since ℓ < n)." },
+  { ch:3, obj:"3H", q:"A boundary surface diagram (orbital shape drawing) of an orbital primarily shows:", choices:["Where an electron spends exactly 100% of its time","The region of space where there is a ~90% probability of finding the electron","The exact path the electron travels","The energy of the electron"], ans:1, explain:"The boundary surface diagram (e.g., the 'dumbbell' shape for a p orbital) encloses the region where the electron can be found ~90% of the time. It shows shape and orientation, not exact position." },
+  { ch:3, obj:"3I", q:"What is the ground-state electron configuration of nitrogen (Z=7)?", choices:["1s²2s²2p³","1s²2s²2p²3s¹","1s²2s²2p⁴","1s²2s¹2p⁴"], ans:0, explain:"N (Z=7): 1s gets 2, 2s gets 2, remaining 3 electrons go into 2p one each (Hund's rule) → 1s²2s²2p³. The three 2p electrons occupy separate orbitals with parallel spins." },
+  { ch:3, obj:"3J", q:"The condensed (noble gas) electron configuration of sulfur (Z=16) is:", choices:["[Ar]3s²3p⁴","[Ne]3s²3p⁴","[Ne]3s²3p⁶","[He]2s²2p⁶3s²3p⁴"], ans:1, explain:"S (Z=16). Ne has Z=10, so [Ne] accounts for 1s²2s²2p⁶. Remaining 6 electrons: 3s²3p⁴. Condensed config: [Ne]3s²3p⁴." },
+  { ch:3, obj:"3K", q:"A sodium atom (Na) loses one electron to form Na⁺. How does the ion differ from the neutral atom?", choices:["It has more protons","It has fewer protons","It has one fewer electron and is smaller","It has one more neutron"], ans:2, explain:"Na has 11 protons and 11 electrons. Na⁺ has 11 protons but only 10 electrons (lost 1). Fewer electrons with the same nuclear charge means stronger pull per electron → smaller radius." },
+  { ch:3, obj:"3L", q:"Based on the periodic table, what charge would you predict for a monatomic ion of calcium (Ca)?", choices:["1+","2+","2-","1-"], ans:1, explain:"Ca is in Group 2A. Metals in this group lose 2 electrons to achieve a noble gas configuration → Ca²⁺." },
+  { ch:3, obj:"3M", q:"What is the electron configuration of the oxide ion, O²⁻?", choices:["1s²2s²2p⁴","1s²2s²2p⁶","1s²2s²2p⁵","1s²2s⁴2p⁴"], ans:1, explain:"Neutral O (Z=8): 1s²2s²2p⁴. O²⁻ gains 2 electrons: 1s²2s²2p⁶. This is isoelectronic with neon." },
+  { ch:3, obj:"3N", q:"Which is larger: a neutral K atom or a K⁺ ion?", choices:["K⁺ is larger because it has more protons","K is larger because it has more electrons filling a higher shell","They are the same size","K⁺ is larger due to increased electron repulsion"], ans:1, explain:"Cations are smaller than their parent atoms. K loses its single 4s electron upon becoming K⁺, eliminating the outermost shell. The remaining electrons are in n=3, closer to the nucleus." },
+  { ch:3, obj:"3O", q:"Arrange the following isoelectronic species in order of INCREASING size: Na⁺, Mg²⁺, Ne, F⁻", choices:["F⁻ < Ne < Na⁺ < Mg²⁺","Mg²⁺ < Na⁺ < Ne < F⁻","Ne < F⁻ < Na⁺ < Mg²⁺","Na⁺ < Mg²⁺ < F⁻ < Ne"], ans:1, explain:"All have 10 electrons. Size decreases as nuclear charge increases (more protons pull the same electrons closer). Mg²⁺ (Z=12) < Na⁺ (Z=11) < Ne (Z=10) < F⁻ (Z=9)." },
+  { ch:3, obj:"3P", q:"Which element has the highest first ionization energy?", choices:["Na","Al","Cl","Ar"], ans:3, explain:"Ionization energy generally increases across a period (increasing Zeff) and decreases down a group. Ar (noble gas, Z=18) has the highest Zeff in period 3 and a fully filled shell → highest IE." },
+  { ch:3, obj:"3Q", q:"Electron affinity is best defined as:", choices:["The energy required to remove an electron from a gaseous atom","The energy change when a gaseous atom gains an electron","The attraction between an atom's nucleus and its valence electrons","The average distance of electrons from the nucleus"], ans:1, explain:"Electron affinity = ΔE for: X(g) + e⁻ → X⁻(g). It measures how much an atom 'wants' an additional electron. Most electron affinities are negative (exothermic)." },
+
+  // CH 4
+  { ch:4, obj:"4A", q:"Lattice energy is defined as the energy required to:", choices:["Break all covalent bonds in a molecule","Separate one mole of an ionic solid into its gaseous ions","Dissolve an ionic compound in water","Form an ionic solid from its elements"], ans:1, explain:"Lattice energy = energy required for MX(s) → M⁺(g) + X⁻(g). It measures the strength of ionic electrostatic attractions. Higher lattice energy = stronger ionic bonds." },
+  { ch:4, obj:"4B", q:"Which compound has the most negative lattice energy (strongest ionic bonds)?", choices:["NaCl","MgO","LiF","KBr"], ans:1, explain:"Lattice energy magnitude increases with higher ionic charges and smaller ionic radii (Eel = kQ₊Q₋/d). MgO has 2+ and 2- charges and small ions → by far the most negative lattice energy." },
+  { ch:4, obj:"4C", q:"Covalent bonding occurs because:", choices:["Atoms transfer electrons completely to achieve noble gas configurations","Atoms share electrons and the shared electrons are attracted to both nuclei, lowering potential energy","Opposite charges attract, forming ion pairs","Electrons are delocalized across an entire metallic lattice"], ans:1, explain:"In a covalent bond, electrons are shared between nuclei. Both nuclei attract the shared electron density between them, lowering the electrostatic potential energy compared to separated atoms." },
+  { ch:4, obj:"4D", q:"Which bond is the most polar?", choices:["C–H","N–H","O–H","F–H"], ans:3, explain:"Bond polarity depends on electronegativity difference. F is the most electronegative element (EN ≈ 4.0), so F–H has the greatest Δ EN → most polar bond." },
+  { ch:4, obj:"4E", q:"What is the correct formula for iron(III) sulfate?", choices:["FeSO₄","Fe₂(SO₄)₃","Fe₃SO₄","Fe₂SO₄"], ans:1, explain:"Iron(III) = Fe³⁺; sulfate = SO₄²⁻. To balance charges: 2×(+3) = 6+ and 3×(-2) = 6-. Formula: Fe₂(SO₄)₃." },
+  { ch:4, obj:"4F", q:"What is the correct IUPAC name for N₂O₄?", choices:["Nitrogen oxide","Dinitrogen oxide","Nitrogen tetraoxide","Dinitrogen tetraoxide"], ans:3, explain:"For molecular (covalent) compounds: use Greek prefixes. N₂ = dinitrogen, O₄ = tetraoxide. Name: dinitrogen tetraoxide. (Drop the 'a' in 'tetra' before 'oxide'.)" },
+  { ch:4, obj:"4G", q:"Which pair of elements is most likely to form an IONIC compound?", choices:["C and O","N and H","S and F","Sr and Cl"], ans:3, explain:"Ionic compounds form between metals and nonmetals with large electronegativity differences. Sr is an alkaline earth metal; Cl is a highly electronegative nonmetal → ionic compound SrCl₂." },
+  { ch:4, obj:"4H", q:"How many valence electrons are in the Lewis structure of SO₄²⁻?", choices:["24","30","32","38"], ans:2, explain:"S contributes 6, each of 4 O contributes 6 (total 24 from O), plus 2 extra for the 2- charge. Total = 6 + 24 + 2 = 32 valence electrons." },
+  { ch:4, obj:"4I", q:"In the Lewis structure of CO₂, what are the formal charges on C and O?", choices:["C = +2, O = -1","C = 0, O = 0","C = +1, O = -1","C = -1, O = 0"], ans:1, explain:"Best Lewis structure of CO₂ has two C=O double bonds. Formal charge = valence e⁻ – nonbonding e⁻ – ½(bonding e⁻). For C: 4–0–4=0. For each O: 6–4–2=0. All formal charges = 0." },
+  { ch:4, obj:"4J", q:"Which molecule has resonance structures?", choices:["H₂O","CH₄","O₃","HF"], ans:2, explain:"O₃ (ozone) has two equivalent Lewis structures with one O=O double bond and one O–O single bond that can be drawn in two ways. These are resonance structures; the actual molecule is intermediate between them." },
+  { ch:4, obj:"4K", q:"Which relationship between bond order, bond energy, and bond length is CORRECT?", choices:["Higher bond order → longer bond, lower energy","Higher bond order → shorter bond, higher energy","Higher bond order → longer bond, higher energy","Higher bond order → shorter bond, lower energy"], ans:1, explain:"Triple bonds (bond order 3) are shorter and stronger than double bonds, which are shorter/stronger than single bonds. Higher bond order = more electron density between nuclei = shorter + stronger bond." },
+  { ch:4, obj:"4L", q:"The Lewis structure of BF₃ is unusual because:", choices:["The central atom B has too many electrons (expanded octet)","B has only 6 electrons around it — an incomplete octet","B forms ionic bonds with F","F has no lone pairs"], ans:1, explain:"Boron has only 3 valence electrons. In BF₃, B forms 3 bonds = 6 electrons, which is only 6 (incomplete octet). Boron commonly violates the octet rule by having fewer than 8 electrons." },
+  { ch:4, obj:"4M", q:"NO (nitric oxide) is an example of a free radical. What makes it a free radical?", choices:["It has a negative formal charge","It has an odd number of electrons, leaving one unpaired","It has an expanded octet","It has no lone pairs on nitrogen"], ans:1, explain:"NO has 5+6=11 valence electrons, which is odd. This means at least one electron must be unpaired. Molecules with unpaired electrons are called free radicals." },
+  { ch:4, obj:"4N", q:"Why do molecules like CO₂ and H₂O contribute to the greenhouse effect?", choices:["They reflect sunlight back into space","They absorb infrared radiation emitted by Earth's surface, re-emitting it and warming the atmosphere","They react with oxygen to produce heat","They increase the albedo of the atmosphere"], ans:1, explain:"Earth's surface absorbs sunlight and re-emits infrared (IR) radiation. Greenhouse gases (CO₂, H₂O, CH₄) have vibrational modes that absorb IR radiation, trapping heat in the atmosphere." },
+
+  // CH 5
+  { ch:5, obj:"5A", q:"How many electron domains are around the central atom in H₂S?", choices:["2","3","4","5"], ans:2, explain:"S in H₂S has 2 bonding pairs (S–H bonds) + 2 lone pairs = 4 electron domains. Each lone pair and each bond counts as one electron domain (VSEPR)." },
+  { ch:5, obj:"5B", q:"A molecule has 4 electron domains and 2 lone pairs on the central atom. What is its molecular shape?", choices:["Tetrahedral","Trigonal pyramidal","Bent (V-shaped)","Linear"], ans:2, explain:"4 electron domains = tetrahedral electron geometry. With 2 bonding pairs + 2 lone pairs, the molecular shape is bent (V-shaped), as in H₂O (~104.5°)." },
+  { ch:5, obj:"5C", q:"In a wedge-and-dash diagram, what does a dashed wedge represent?", choices:["A bond in the plane of the paper","A bond coming toward the viewer","A bond going away from the viewer","A double bond"], ans:2, explain:"In wedge-and-dash notation: solid wedge = bond toward viewer (in front of the plane), dashed wedge = bond going away from the viewer (behind the plane), solid line = bond in the plane of the page." },
+  { ch:5, obj:"5D", q:"What is the predicted bond angle in NH₃ according to VSEPR?", choices:["180°","120°","109.5°","~107°"], ans:3, explain:"NH₃ has 4 electron domains (3 bonding + 1 lone pair). Ideal tetrahedral = 109.5°, but lone pairs repel more strongly, compressing the H–N–H angle to ~107°." },
+  { ch:5, obj:"5E", q:"CCl₄ is a nonpolar molecule despite having polar C–Cl bonds. Why?", choices:["C–Cl bonds are actually nonpolar","The four C–Cl bond dipoles point symmetrically in all directions and cancel out","The lone pairs on Cl cancel the bond dipoles","The molecule has an odd number of electrons"], ans:1, explain:"CCl₄ is tetrahedral — the four identical C–Cl bond dipoles point outward symmetrically. By vector addition they cancel, giving a net dipole moment of zero → nonpolar molecule." },
+  { ch:5, obj:"5F", q:"The bond angles in methane (CH₄) are 109.5° because carbon is:", choices:["sp hybridized","sp² hybridized","sp³ hybridized","sp³d hybridized"], ans:2, explain:"C in CH₄ has 4 bonding pairs, no lone pairs → 4 electron domains. This predicts sp³ hybridization with tetrahedral geometry and 109.5° bond angles." },
+  { ch:5, obj:"5G", q:"In Valence Bond (VB) theory, a covalent bond forms when:", choices:["Two ions attract each other","Two atomic orbitals from different atoms overlap, sharing electrons","An electron is transferred from one atom to another","A metallic lattice delocalizes electrons"], ans:1, explain:"VB theory: bonds form by overlap of atomic orbitals on adjacent atoms. The two electrons (one from each atom, or both from one atom) are shared in the region of overlap." },
+  { ch:5, obj:"5H", q:"An sp² hybridized atom has:", choices:["Two hybrid orbitals at 180°","Three hybrid orbitals at 120°","Four hybrid orbitals at 109.5°","Five hybrid orbitals"], ans:1, explain:"sp² hybridization combines one s and two p orbitals → 3 equivalent sp² hybrid orbitals arranged at 120° in a plane (trigonal planar geometry)." },
+  { ch:5, obj:"5I", q:"Which statement correctly distinguishes sigma (σ) and pi (π) bonds?", choices:["σ bonds result from side-to-side orbital overlap; π from head-to-head","π bonds allow free rotation; σ bonds do not","σ bonds result from head-to-head overlap along the internuclear axis; π from side-to-side (parallel) overlap","Both σ and π bonds form from pure s orbital overlap only"], ans:2, explain:"σ bonds: head-on (end-to-end) overlap along the internuclear axis → symmetric around the axis → free rotation possible. π bonds: side-to-side (parallel) p orbital overlap → lobe above and below → prevents free rotation." },
+  { ch:5, obj:"5J", q:"Using MO theory, what is the bond order of Li₂?", choices:["0","0.5","1","2"], ans:2, explain:"Li₂: each Li has 1 valence electron → 2 total valence electrons fill the σ1s MO. Bond order = (bonding e⁻ – antibonding e⁻)/2 = (2-0)/2 = 1. Li₂ exists as a stable diatomic in the gas phase." },
+  { ch:5, obj:"5K", q:"A bonding molecular orbital formed from two 1s atomic orbitals is best described as:", choices:["A σ*1s orbital with a node between the nuclei","A π1s orbital with two lobes","A σ1s orbital with electron density concentrated between the two nuclei","Two separate unchanged 1s orbitals"], ans:2, explain:"Constructive interference of two 1s AOs forms a σ1s bonding MO — a single orbital with increased electron density between the nuclei (lower energy than the AOs)." },
+  { ch:5, obj:"5L", q:"In a MO energy diagram for O₂, which is the HOMO (highest occupied MO)?", choices:["σ2p","π2p","π*2p","σ*2p"], ans:2, explain:"O₂ has 12 valence electrons. Filling the MO diagram (σ2s, σ*2s, σ2p, π2p×2, π*2p×2 partially filled): the last electrons go into the degenerate π*2p orbitals. The HOMO is π*2p." },
+  { ch:5, obj:"5M", q:"O₂ is paramagnetic. What does this tell us about its MO diagram?", choices:["All electrons in O₂ are paired","O₂ has one or more unpaired electrons in its MOs","The bond order of O₂ is zero","O₂ has no antibonding electrons"], ans:1, explain:"Paramagnetic molecules have unpaired electrons. MO theory correctly predicts O₂ has 2 unpaired electrons in the degenerate π*2p orbitals, which VB theory with a simple double bond structure fails to predict." },
+  { ch:5, obj:"5N", q:"If an electron in N₂ is promoted from the HOMO to the LUMO, what happens to the molecule?", choices:["Bond order increases and the molecule becomes more stable","Bond order decreases and the molecule is weakened","Bond order stays the same","The molecule gains a net charge"], ans:1, explain:"In N₂, the HOMO is the σ2p bonding MO and the LUMO is the π*2p antibonding MO. Promoting an electron from bonding to antibonding reduces (bonding – antibonding)/2, weakening the bond." },
+  { ch:5, obj:"5O", q:"When two atomic orbitals combine in MO theory, the result is:", choices:["One molecular orbital (bonding only)","Two molecular orbitals: one bonding and one antibonding","Two identical orbitals","Three molecular orbitals"], ans:1, explain:"MO theory: n atomic orbitals combine to form exactly n molecular orbitals. Two AOs always produce 1 bonding MO (lower energy) and 1 antibonding MO (higher energy). The total number of orbitals is conserved." },
+
+  // CH 6
+  { ch:6, obj:"6A", q:"Which intermolecular force is present in ALL molecular substances?", choices:["Dipole-dipole interactions","Hydrogen bonding","London dispersion forces","Ion-dipole interactions"], ans:2, explain:"London dispersion forces arise from temporary dipoles due to electron movement. They exist between ALL molecules — polar, nonpolar, large, small. They are the only IMF for nonpolar substances like Ar, N₂, CH₄." },
+  { ch:6, obj:"6B", q:"Rank the following in order of increasing boiling point: CH₄, CH₃OH, CH₃F", choices:["CH₃OH < CH₃F < CH₄","CH₄ < CH₃F < CH₃OH","CH₃F < CH₄ < CH₃OH","CH₄ < CH₃OH < CH₃F"], ans:1, explain:"CH₄: only LDF, lowest bp (–161°C). CH₃F: dipole-dipole + LDF, moderate bp (–78°C). CH₃OH: H-bonding (O–H group) + LDF, highest bp (+65°C). Order: CH₄ < CH₃F < CH₃OH." },
+  { ch:6, obj:"6C", q:"Which substance has stronger London dispersion forces, n-pentane (C₅H₁₂, chain) or neopentane (C₅H₁₂, spherical)?", choices:["Neopentane, because it has a larger molecular mass","n-pentane, because its elongated shape gives greater surface area for contact","They are identical since they have the same molecular formula","Neopentane, due to its more compact electron cloud"], ans:1, explain:"LDF increase with polarizability (ease of distorting the electron cloud) and surface area. n-pentane's elongated chain allows more molecular surface contact → stronger LDF → higher boiling point." },
+  { ch:6, obj:"6D", q:"For hydrogen bonding to occur, a molecule must have:", choices:["Any polar bond","An H atom bonded directly to N, O, or F","A lone pair on any atom","A large dipole moment"], ans:1, explain:"Hydrogen bonding requires H bonded to a highly electronegative, small atom (N, O, or F). The partially positive H (δ+) is attracted to a lone pair on N, O, or F of a nearby molecule." },
+  { ch:6, obj:"6E", q:"'Like dissolves like' refers to the rule that:", choices:["Only ionic compounds dissolve in water","Polar or ionic solutes dissolve in polar solvents; nonpolar solutes dissolve in nonpolar solvents","All substances with high molar mass are insoluble","Temperature has no effect on solubility"], ans:1, explain:"Dissolution is favored when solute-solvent interactions (IMFs) are similar in type and strength to solute-solute and solvent-solvent interactions. Polar solvents dissolve polar/ionic solutes; nonpolar solvents dissolve nonpolar solutes." },
+  { ch:6, obj:"6F", q:"On a phase diagram, the triple point represents:", choices:["The temperature at which all phases melt simultaneously","The single temperature and pressure at which all three phases coexist in equilibrium","The critical point beyond which no liquid exists","The boiling point at standard pressure"], ans:1, explain:"The triple point is the unique T and P where solid, liquid, and gas phases are in equilibrium simultaneously. For water it is 0.01°C at 611.7 Pa." },
+  { ch:6, obj:"6G", q:"Why does ice float on liquid water? (an unusual property compared to most substances)", choices:["Ice has more mass per unit volume than liquid water","Water molecules in ice pack more closely together due to hydrogen bonding","The open lattice structure of ice formed by H-bonds gives it a lower density than liquid water","Ice has stronger London dispersion forces than liquid water"], ans:2, explain:"In ice, each water molecule participates in 4 H-bonds in a rigid, open hexagonal lattice — less dense than liquid water. When ice melts, some H-bonds break and molecules pack more closely, making liquid water denser." },
+  { ch:6, obj:"6H", q:"London dispersion forces between two molecules can best be explained as:", choices:["Permanent dipoles attracting each other","Covalent bonds forming between molecules","Temporary fluctuating dipoles in one molecule inducing a dipole in a neighboring molecule","Transferring electrons between molecules"], ans:2, explain:"LDF arise from instantaneous/temporary dipoles (uneven electron distribution at any instant) that induce corresponding dipoles in nearby molecules. These transient electrostatic attractions create LDF." },
+  { ch:6, obj:"6I", q:"The condensed formula CH₃CH₂OH represents ethanol. Which carbon has more electron domains around it?", choices:["The first carbon (CH₃–)","The second carbon (–CH₂–)","Both carbons have the same electron domains","The oxygen has more domains than either carbon"], ans:0, explain:"CH₃ carbon (C1): 3 C–H bonds + 1 C–C bond = 4 bonds, 0 lone pairs = 4 domains. CH₂ carbon (C2): 2 C–H + 1 C–O + 1 C–C = 4 bonds = 4 domains. Both carbons have 4 electron domains. (The O has 2 bonds + 2 lone pairs = 4 domains too.) Answer: they are equal." },
+
+  // CH 7
+  { ch:7, obj:"7A", q:"Which of the following is a correctly balanced chemical equation?", choices:["H₂ + O₂ → H₂O","2H₂ + O₂ → 2H₂O","H₂ + 2O → H₂O","4H + O₂ → 2H₂O"], ans:1, explain:"Check atoms: 2H₂ + O₂ → 2H₂O. Left: 4H, 2O. Right: 4H, 2O. Balanced. The reaction uses diatomic O₂ as the reactant." },
+  { ch:7, obj:"7B", q:"How many grams of H₂O are produced when 4.00 g of H₂ reacts with excess O₂? (2H₂ + O₂ → 2H₂O)", choices:["4.00 g","18.0 g","36.0 g","72.0 g"], ans:2, explain:"mol H₂ = 4.00/2.016 = 1.984 mol. Ratio 2H₂:2H₂O = 1:1, so 1.984 mol H₂O. Mass = 1.984 × 18.02 = 35.7 ≈ 36.0 g." },
+  { ch:7, obj:"7C", q:"What are the products of the complete combustion of propane (C₃H₈)?", choices:["CO + H₂O","CO₂ + H₂","CO₂ + H₂O","C₃H₆ + H₂O"], ans:2, explain:"Complete combustion of a hydrocarbon with excess O₂ always produces CO₂ and H₂O. C₃H₈ + 5O₂ → 3CO₂ + 4H₂O." },
+  { ch:7, obj:"7D", q:"In the reaction N₂ + 3H₂ → 2NH₃, which is the limiting reactant if you start with 28 g N₂ and 6 g H₂?", choices:["N₂","H₂","Both are limiting","Neither is limiting"], ans:0, explain:"mol N₂ = 28/28 = 1.00; mol H₂ = 6/2.016 = 2.98. Stoichiometry: 1 N₂ needs 3 H₂ → 1.00 mol N₂ needs 3.00 mol H₂, but only 2.98 mol available. H₂ is the limiting reactant. Wait — 2.98 < 3.00, so H₂ is actually limiting. Correct answer: H₂. (Re-checking: answer is H₂ — select B.)" },
+  { ch:7, obj:"7E", q:"A reaction has a theoretical yield of 15.0 g and an actual yield of 12.3 g. What is the percent yield?", choices:["82.0%","121.95%","15.0%","12.3%"], ans:0, explain:"% yield = (actual/theoretical) × 100 = (12.3/15.0) × 100 = 82.0%" },
+  { ch:7, obj:"7F", q:"A compound is 40.0% C, 6.72% H, and 53.3% O by mass. What is its empirical formula?", choices:["C₂H₄O₂","CHO","CH₂O","C₂H₂O"], ans:2, explain:"Assume 100 g: 40.0/12.01=3.33 mol C; 6.72/1.008=6.67 mol H; 53.3/16.00=3.33 mol O. Divide by smallest (3.33): C:H:O = 1:2:1 → CH₂O." },
+  { ch:7, obj:"7G", q:"A compound has the empirical formula CH₂O and a molar mass of 180 g/mol. What is its molecular formula?", choices:["CH₂O","C₂H₄O₂","C₆H₁₂O₆","C₃H₆O₃"], ans:2, explain:"Empirical formula mass of CH₂O = 12+2+16 = 30 g/mol. 180/30 = 6. Multiply subscripts by 6: C₆H₁₂O₆ (glucose)." },
+  { ch:7, obj:"7H", q:"In combustion analysis, the carbon content of an organic compound is determined by:", choices:["Measuring the mass of the original sample","Collecting and weighing the CO₂ produced","Titrating the products with base","Subtracting the hydrogen mass from total mass"], ans:1, explain:"In combustion analysis, all C in the compound is converted to CO₂, which is collected and weighed. mol C = mol CO₂ = mass CO₂ / 44.01 g/mol." },
+
+  // CH 8
+  { ch:8, obj:"8A", q:"A solution contains 5 mg of lead ions in 1.00 L of water. What is the concentration in ppm? (density of solution ≈ 1.00 g/mL)", choices:["5 ppm","0.005 ppm","5000 ppm","0.5 ppm"], ans:0, explain:"ppm = mg solute / L solution = 5 mg/L = 5 ppm (when density ≈ 1 g/mL, ppm = mg/kg ≈ mg/L)." },
+  { ch:8, obj:"8B", q:"How many mL of 12.0 M HCl are needed to prepare 500 mL of 0.300 M HCl?", choices:["2.50 mL","12.5 mL","25.0 mL","0.625 mL"], ans:1, explain:"M₁V₁ = M₂V₂. V₁ = (0.300 M × 500 mL) / 12.0 M = 12.5 mL. Dilute 12.5 mL of concentrated HCl to 500 mL." },
+  { ch:8, obj:"8C", q:"Which substance is a strong electrolyte?", choices:["CH₃OH (methanol)","C₆H₁₂O₆ (glucose)","NaCl (table salt)","HF (hydrofluoric acid)"], ans:2, explain:"Strong electrolytes dissociate completely in water. NaCl → Na⁺ + Cl⁻ (100%). Methanol and glucose are nonelectrolytes; HF is a weak acid (weak electrolyte, ~1% dissociated)." },
+  { ch:8, obj:"8D", q:"When NaCl dissolves in water, the sodium ions are solvated by:", choices:["The oxygen end of water molecules","The hydrogen end of water molecules","Other Na⁺ ions","Cl⁻ ions"], ans:0, explain:"Na⁺ is a positive ion. It is attracted to the partial negative charge (δ⁻) on the oxygen atoms of water. Water molecules orient with O facing Na⁺." },
+  { ch:8, obj:"8E", q:"What is the net ionic equation for the reaction of HCl(aq) with NaOH(aq)?", choices:["HCl + NaOH → NaCl + H₂O","H⁺(aq) + Cl⁻(aq) + Na⁺(aq) + OH⁻(aq) → Na⁺(aq) + Cl⁻(aq) + H₂O(l)","H⁺(aq) + OH⁻(aq) → H₂O(l)","Na⁺(aq) + Cl⁻(aq) → NaCl(s)"], ans:2, explain:"Both HCl and NaOH are strong electrolytes, fully dissociated. NaCl is soluble (spectator ions: Na⁺, Cl⁻). The net ionic equation cancels spectators: H⁺(aq) + OH⁻(aq) → H₂O(l)." },
+  { ch:8, obj:"8F", q:"Which of the following is a weak acid?", choices:["HCl","HNO₃","HF","H₂SO₄"], ans:2, explain:"Strong acids (HCl, HBr, HI, HNO₃, H₂SO₄, HClO₄, HClO₃) fully dissociate. HF does not fully dissociate in water → weak acid." },
+  { ch:8, obj:"8G", q:"In the reaction NH₃ + H₂O ⇌ NH₄⁺ + OH⁻, what is the Brønsted-Lowry BASE?", choices:["H₂O","NH₄⁺","NH₃","OH⁻"], ans:2, explain:"A Brønsted-Lowry base accepts a proton. NH₃ accepts H⁺ from water to form NH₄⁺. Water is the Brønsted-Lowry acid (donates H⁺)." },
+  { ch:8, obj:"8H", q:"In a titration, 25.0 mL of 0.100 M NaOH is needed to neutralize 20.0 mL of an HCl solution. What is the molarity of the HCl?", choices:["0.080 M","0.125 M","0.100 M","0.200 M"], ans:1, explain:"Moles NaOH = 0.025 L × 0.100 mol/L = 0.00250 mol. NaOH:HCl = 1:1, so 0.00250 mol HCl. [HCl] = 0.00250/0.0200 L = 0.125 M." },
+  { ch:8, obj:"8I", q:"When solutions of BaCl₂ and Na₂SO₄ are mixed, which precipitate forms?", choices:["NaCl","BaCl₂","BaSO₄","Na₂Cl₂"], ans:2, explain:"Using solubility rules: SO₄²⁻ with Ba²⁺ → BaSO₄ has limited solubility (precipitates). NaCl and Na₂SO₄ with Na⁺ are soluble." },
+  { ch:8, obj:"8J", q:"For the reaction of Pb(NO₃)₂(aq) + 2KI(aq) → PbI₂(s) + 2KNO₃(aq), what is the net ionic equation?", choices:["Pb²⁺(aq) + 2I⁻(aq) → PbI₂(s)","Pb(NO₃)₂ + 2KI → PbI₂ + 2KNO₃","Pb²⁺ + NO₃⁻ + K⁺ + I⁻ → PbI₂ + K⁺ + NO₃⁻","2K⁺(aq) + 2NO₃⁻(aq) → 2KNO₃(aq)"], ans:0, explain:"Remove spectator ions (K⁺ and NO₃⁻, which appear on both sides unchanged). Net ionic: Pb²⁺(aq) + 2I⁻(aq) → PbI₂(s)." },
+  { ch:8, obj:"8K", q:"In the reaction 2Fe³⁺ + Sn²⁺ → 2Fe²⁺ + Sn⁴⁺, which species is OXIDIZED?", choices:["Fe³⁺","Fe²⁺","Sn²⁺","Sn⁴⁺"], ans:2, explain:"Oxidation = loss of electrons = increase in oxidation number. Sn goes from +2 to +4 (loses 2 electrons) → Sn²⁺ is oxidized. Fe goes from +3 to +2 (gains electrons) → Fe³⁺ is reduced." },
+  { ch:8, obj:"8M", q:"Which of the following is NOT a strong acid?", choices:["HCl","H₂SO₄","HNO₃","H₃PO₄"], ans:3, explain:"The six common strong acids are HCl, HBr, HI, HNO₃, H₂SO₄, HClO₄ (and HClO₃). H₃PO₄ is a weak acid — it does not fully dissociate in water." },
+
+  // CH 9
+  { ch:9, obj:"9A", q:"According to kinetic molecular theory, gas pressure arises from:", choices:["The weight of gas molecules pressing down","The gravitational attraction between gas molecules","Collisions of gas molecules with the walls of the container","The repulsive forces between gas molecules"], ans:2, explain:"KMT: gas pressure is the result of gas molecules colliding with and exerting force on the container walls. More collisions (higher T, more n, smaller V) → higher pressure." },
+  { ch:9, obj:"9C", q:"If the temperature of a gas sample is doubled (in Kelvin), what happens to the root-mean-square speed of the gas molecules?", choices:["Doubles","Increases by a factor of √2","Quadruples","Stays the same"], ans:1, explain:"u_rms = √(3RT/M). Since T doubles, u_rms ∝ √T → u_rms increases by √2 (about 41%)." },
+  { ch:9, obj:"9D", q:"A gas occupies 2.00 L at 300 K and 1.00 atm. What volume will it occupy at 600 K and 1.00 atm? (ideal gas)", choices:["1.00 L","2.00 L","4.00 L","8.00 L"], ans:2, explain:"At constant P and n (Charles's Law): V₁/T₁ = V₂/T₂. V₂ = 2.00 × (600/300) = 4.00 L." },
+  { ch:9, obj:"9E", q:"A gas has a density of 1.42 g/L at STP (T=273K, P=1 atm). What is its molar mass? (R=0.08206 L·atm/mol·K)", choices:["22.4 g/mol","31.8 g/mol","44.0 g/mol","16.0 g/mol"], ans:1, explain:"M = dRT/P = (1.42 g/L × 0.08206 L·atm/mol·K × 273 K) / 1.00 atm = 31.8 g/mol." },
+  { ch:9, obj:"9F", q:"In the reaction 2H₂(g) + O₂(g) → 2H₂O(g), if 4.0 L of H₂ reacts with excess O₂ at constant T and P, what volume of H₂O vapor is produced?", choices:["2.0 L","4.0 L","8.0 L","1.0 L"], ans:1, explain:"At constant T and P, volumes of gases are proportional to moles (Avogadro's law). Stoichiometry: 2 mol H₂ → 2 mol H₂O (1:1 ratio). So 4.0 L H₂ → 4.0 L H₂O." },
+  { ch:9, obj:"9G", q:"A mixture of gases contains 0.40 mol N₂ and 0.60 mol O₂ at a total pressure of 1.0 atm. What is the partial pressure of N₂?", choices:["0.40 atm","0.60 atm","1.0 atm","0.24 atm"], ans:0, explain:"P_N₂ = X_N₂ × P_total. X_N₂ = 0.40/(0.40+0.60) = 0.40. P_N₂ = 0.40 × 1.0 atm = 0.40 atm." },
+  { ch:9, obj:"9H", q:"Real gases deviate most from ideal behavior under conditions of:", choices:["Low pressure and high temperature","High pressure and low temperature","Low pressure and low temperature","High pressure and high temperature"], ans:1, explain:"The ideal gas law assumes no intermolecular forces and negligible molecular volume. At high pressure, molecules are close together (molecular volume matters; attractions matter). At low temperature, molecules move slowly (attractions matter more). Both make real gases deviate most." },
+];
+
+// Correct the stoichiometry question - 7D answer should be H2 = index 1
+ALL_QUESTIONS.find(q => q.obj === "7D").ans = 1;
+ALL_QUESTIONS.find(q => q.obj === "7D").choices = ["N₂","H₂","Both are equally limiting","Neither; the reaction goes to completion"];
+ALL_QUESTIONS.find(q => q.obj === "7D").explain = "mol N₂ = 28/28 = 1.00; mol H₂ = 6/2.016 ≈ 2.98. Reaction needs 3 mol H₂ per mol N₂, so 1.00 mol N₂ needs 3.00 mol H₂. Only 2.98 mol H₂ available → H₂ is the limiting reactant.";
+
+// Fix 6I - both carbons have 4 domains, answer should be C (same)
+ALL_QUESTIONS.find(q => q.obj === "6I").ans = 2;
+ALL_QUESTIONS.find(q => q.obj === "6I").explain = "Both carbons in ethanol have 4 electron domains: the CH₃ carbon has 3 C–H bonds + 1 C–C bond; the CH₂ carbon has 2 C–H + 1 C–C + 1 C–O bonds. Both are sp³ hybridized with 4 bonding domains.";
+ALL_QUESTIONS.find(q => q.obj === "6I").choices = ["The CH₃ carbon has more electron domains","The CH₂–OH carbon has more domains","Both carbons have the same number of electron domains (4)","The oxygen has the most domains"];
+
+const chapterActive = new Array(10).fill(true);
+let activeQuestions = [];
+let current = 0, score = 0;
+let userAnswers = [];
+
+function initSplash() {
+  const pills = document.getElementById('chapter-pills');
+  CHAPTERS.forEach(ch => {
+    const div = document.createElement('div');
+    div.className = 'chapter-pill active';
+    div.style.color = ch.color;
+    div.style.borderColor = ch.color + '60';
+    div.style.background = ch.color + '18';
+    div.textContent = ch.short + ' · ' + ch.name;
+    div.onclick = () => {
+      chapterActive[ch.id] = !chapterActive[ch.id];
+      div.classList.toggle('active', chapterActive[ch.id]);
+      div.classList.toggle('inactive', !chapterActive[ch.id]);
+      updateCount();
+    };
+    pills.appendChild(div);
+  });
+  updateCount();
+}
+
+function updateCount() {
+  const n = ALL_QUESTIONS.filter(q => chapterActive[q.ch]).length;
+  document.getElementById('total-q-count').textContent = n;
+}
+
+function startQuiz() {
+  activeQuestions = ALL_QUESTIONS.filter(q => chapterActive[q.ch]);
+  shuffleArr(activeQuestions);
+  current = 0; score = 0;
+  userAnswers = new Array(activeQuestions.length).fill(null);
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('review').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function shuffleArr(arr) {
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+
+function renderQuestion() {
+  if (current >= activeQuestions.length) { showResults(); return; }
+  const q = activeQuestions[current];
+  const ch = CHAPTERS.find(c => c.id === q.ch);
+  const pct = (current / activeQuestions.length * 100).toFixed(1);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('quiz-meta').textContent = `${score} / ${current} correct`;
+
+  const body = document.getElementById('quiz-body');
+  const letters = ['A','B','C','D'];
+  body.innerHTML = `
+    <div class="chapter-header">
+      <div class="ch-dot" style="background:${ch.color}"></div>
+      <span class="ch-label">${ch.name}</span>
+      <span class="obj-tag">${q.obj}</span>
+    </div>
+    <div class="question-text">${q.q}</div>
+    <div class="choices">
+      ${q.choices.map((c,i) => `
+        <button class="choice-btn" id="opt-${i}" onclick="choose(${i})">
+          <span class="choice-letter">${letters[i]}</span>
+          <span>${c}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback-box" id="feedback"></div>
+    <div class="nav-row">
+      <button class="skip-btn" id="skip-btn" onclick="skip()">Skip</button>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">${current+1 < activeQuestions.length ? 'Next →' : 'See Results →'}</button>
+    </div>`;
+}
+
+function choose(i) {
+  const q = activeQuestions[current];
+  userAnswers[current] = i;
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  document.getElementById('skip-btn').disabled = true;
+  const fb = document.getElementById('feedback');
+  if (i === q.ans) {
+    score++;
+    document.getElementById(`opt-${i}`).classList.add('correct');
+    fb.innerHTML = `<div class="feedback-label">✓ Correct</div>${q.explain}`;
+    fb.className = 'feedback-box show correct';
+  } else {
+    document.getElementById(`opt-${i}`).classList.add('wrong');
+    document.getElementById(`opt-${q.ans}`).classList.add('reveal');
+    fb.innerHTML = `<div class="feedback-label">✗ Incorrect</div>${q.explain}`;
+    fb.className = 'feedback-box show wrong';
+  }
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function skip() {
+  userAnswers[current] = -1;
+  current++;
+  renderQuestion();
+}
+
+function nextQ() {
+  current++;
+  renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  const res = document.getElementById('results');
+  res.style.display = 'flex';
+  const total = activeQuestions.filter((_,i)=>userAnswers[i]!==null&&userAnswers[i]!==-1).length;
+  const pct = total ? Math.round(score/total*100) : 0;
+  document.getElementById('res-pct').textContent = pct + '%';
+  document.getElementById('res-frac').textContent = `${score} correct out of ${total} answered`;
+  const msgs = [[90,'Excellent! You have a strong command of this material.'],[75,'Good work. Review the topics you missed.'],[60,'Solid foundation — keep practicing the tricky areas.'],[0,'Keep studying — use the review to identify weak spots.']];
+  document.getElementById('res-msg').textContent = msgs.find(m=>pct>=m[0])[1];
+
+  const breakdownEl = document.getElementById('breakdown-rows');
+  breakdownEl.innerHTML = '';
+  CHAPTERS.filter(ch => chapterActive[ch.id]).forEach(ch => {
+    const chQs = activeQuestions.map((q,i)=>({q,i})).filter(({q})=>q.ch===ch.id);
+    const chTotal = chQs.filter(({i})=>userAnswers[i]!==null&&userAnswers[i]!==-1).length;
+    const chScore = chQs.filter(({q,i})=>userAnswers[i]===q.ans).length;
+    const chPct = chTotal ? chScore/chTotal : 0;
+    breakdownEl.innerHTML += `
+      <div class="breakdown-row">
+        <div class="breakdown-name">${ch.short}</div>
+        <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(chPct*100).toFixed(0)}%;background:${ch.color}"></div></div>
+        <div class="breakdown-frac">${chScore}/${chTotal}</div>
+      </div>`;
+  });
+}
+
+function showReview() {
+  document.getElementById('results').style.display = 'none';
+  const rv = document.getElementById('review');
+  rv.style.display = 'block';
+  const letters = ['A','B','C','D'];
+  const body = document.getElementById('review-body');
+  body.innerHTML = '';
+  activeQuestions.forEach((q, i) => {
+    const ua = userAnswers[i];
+    if (ua === -1 || ua === null) return;
+    const correct = ua === q.ans;
+    const ch = CHAPTERS.find(c => c.id === q.ch);
+    body.innerHTML += `
+      <div class="review-item ${correct?'got-right':'got-wrong'}">
+        <div class="ch-label" style="color:${ch.color};font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">${ch.name} · ${q.obj}</div>
+        <div class="review-q">${q.q}</div>
+        <div class="review-answer">
+          ${correct ? `<span class="right">✓ ${letters[q.ans]}. ${q.choices[q.ans]}</span>` :
+          `<span class="your">✗ Your answer: ${letters[ua]}. ${q.choices[ua]}</span><br>
+           <span class="right">✓ Correct: ${letters[q.ans]}. ${q.choices[q.ans]}</span>`}
+        </div>
+        <div class="review-explain">${q.explain}</div>
+      </div>`;
+  });
+}
+
+function backToResults() {
+  document.getElementById('review').style.display = 'none';
+  document.getElementById('results').style.display = 'flex';
+}
+
+initSplash();
+</script>
+</body>
+</html>

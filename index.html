@@ -1241,6 +1241,292 @@
     color: var(--muted);
   }
 
+  /* ════ INSIGHTS ════ */
+  .insights-wrap {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 2.5rem 2.5rem 4rem;
+  }
+  .insights-head {
+    text-align: center; margin-bottom: 2rem;
+  }
+  .insights-head h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+  .insights-head h2 em { color: #6ab4f7; font-style: normal; font-weight: 500; }
+  .insights-head p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .insights-blurb {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .insights-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  .ins-stat-cell {
+    text-align: center;
+    padding: 4px;
+  }
+  .ins-stat-v {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1;
+  }
+  .ins-stat-v.big-good { color: #4ade80; }
+  .ins-stat-v.big-bad { color: #f06060; }
+  .ins-stat-l {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+  }
+
+  .insights-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .insights-empty .empty-icon {
+    font-size: 36px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  /* heatmap */
+  .heatmap-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 80px 60px;
+    gap: 0.75rem;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .heatmap-row:hover { background: var(--surface2); border-color: var(--border-hover); }
+  .heatmap-row.expanded { background: var(--surface2); }
+  .heatmap-row.no-data { opacity: 0.5; cursor: default; }
+  .heatmap-row.no-data:hover { background: var(--surface); border-color: var(--border); }
+  .hm-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .hm-label .hm-ch-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-right: 8px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .hm-bar-track {
+    background: var(--bg);
+    height: 16px;
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .hm-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    background: linear-gradient(90deg, #f06060, #fbbf24 50%, #4ade80);
+  }
+  .hm-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    text-align: right;
+    color: var(--text);
+  }
+  .hm-pct.weak { color: #f06060; }
+  .hm-pct.medium { color: #fcd34d; }
+  .hm-pct.strong { color: #4ade80; }
+  .hm-attempts {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .objective-list {
+    margin: 6px 0 12px;
+    padding: 0.6rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: none;
+  }
+  .objective-list.show { display: block; }
+  .obj-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 60px 50px;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 12px;
+  }
+  .obj-row + .obj-row { border-top: 1px solid var(--border); }
+  .obj-row .or-id {
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .obj-row .or-bar {
+    background: var(--surface2);
+    height: 8px;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .obj-row .or-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #f06060, #fbbf24 50%, #4ade80);
+  }
+  .obj-row .or-pct {
+    font-family: 'DM Mono', monospace;
+    text-align: right;
+    font-size: 11px;
+  }
+  .obj-row .or-pct.weak { color: #f06060; }
+  .obj-row .or-pct.medium { color: #fcd34d; }
+  .obj-row .or-pct.strong { color: #4ade80; }
+  .obj-row .or-att {
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    font-size: 10px;
+    text-align: right;
+  }
+
+  /* missed questions */
+  .miss-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid #f06060;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.6rem;
+    transition: all 0.15s;
+  }
+  .miss-card:hover { background: var(--surface2); border-color: var(--border-hover); border-left-color: #f06060; }
+  .miss-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .miss-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid;
+  }
+  .miss-tag.chem101 { color: #a898f8; border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.08); }
+  .miss-tag.lab { color: #f7a896; border-color: rgba(247,131,106,0.4); background: rgba(247,131,106,0.08); }
+  .miss-tag.tournament { color: #fcd34d; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.08); }
+  .miss-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+  .miss-q {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 0.8rem;
+  }
+  .miss-choices {
+    margin-bottom: 0.8rem;
+  }
+  .miss-choice {
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--bg);
+    line-height: 1.45;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .miss-choice .mc-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    margin-top: 1px;
+  }
+  .miss-choice.correct {
+    border-color: rgba(62,207,142,0.5);
+    background: rgba(62,207,142,0.08);
+    color: #7fe8be;
+  }
+  .miss-choice.correct .mc-letter { border-color: rgba(62,207,142,0.5); color: #7fe8be; }
+  .miss-choice.your-pick {
+    border-color: rgba(240,96,96,0.5);
+    background: rgba(240,96,96,0.08);
+    color: #f5a0a0;
+  }
+  .miss-choice.your-pick .mc-letter { border-color: rgba(240,96,96,0.5); color: #f5a0a0; }
+  .miss-explain {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+  }
+  .miss-explain b {
+    color: var(--text);
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 4px;
+  }
+
   /* FOOTER */
   footer {
     position: relative; z-index: 1;
@@ -1293,6 +1579,7 @@
     <button class="nav-tab active" data-tab="games" onclick="switchTab('games')">Games</button>
     <button class="nav-tab" data-tab="tournament" onclick="switchTab('tournament')">Tournament</button>
     <button class="nav-tab" data-tab="collection" onclick="switchTab('collection')">Collection</button>
+    <button class="nav-tab" data-tab="insights" onclick="switchTab('insights')">Insights</button>
   </div>
   <div class="nav-spacer"></div>
   <a href="#wallet-strip" class="coin-pill" data-wallet-bumps title="Your study coins">
@@ -1433,6 +1720,28 @@
 
     <div class="filter-row" id="filterRow"></div>
     <div class="element-grid" id="elementGrid"></div>
+  </div>
+</div>
+
+<!-- ════ INSIGHTS PANEL ════ -->
+<div class="panel" id="panel-insights">
+  <div class="insights-wrap">
+    <div class="insights-head">
+      <h2>Study <em>Insights</em></h2>
+      <p>See where you're strong, where you're shaky, and which questions you've been missing. Powered by every answer you've logged.</p>
+    </div>
+
+    <div class="insights-stats" id="insightsStats"></div>
+
+    <div class="section-label" style="padding:0;margin-bottom:1rem;"><span>Weak-spot heatmap</span><div class="section-line"></div></div>
+    <p class="insights-blurb">Accuracy per chapter. Click a row to see per-objective accuracy. Short-answer lab attempts aren't graded, so they're excluded.</p>
+    <div id="heatmap"></div>
+
+    <div class="section-label" style="padding:0;margin:2rem 0 1rem;"><span>Recent misses</span><div class="section-line"></div></div>
+    <p class="insights-blurb">Most recent question you got wrong, per question. Once you get one right, it falls off this list.</p>
+
+    <div class="filter-row" id="missesFilterRow"></div>
+    <div id="missesList"></div>
   </div>
 </div>
 
@@ -1669,6 +1978,34 @@ function toggleSound() {
     el.textContent = soundOn ? '🔊' : '🔇';
   });
   if (soundOn) initAudio().then(() => playCoin({ volume: 0.35 }));
+}
+
+/* ════ QUESTION HISTORY ════ */
+const HISTORY_KEY = 'chem101_history_v1';
+const HISTORY_CAP = 2000;
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveHistory(hist) {
+  try {
+    if (hist.length > HISTORY_CAP) hist = hist.slice(hist.length - HISTORY_CAP);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+  } catch (e) { /* quota — silent */ }
+}
+
+function logAnswer(record) {
+  const hist = loadHistory();
+  hist.push({ ...record, ts: Date.now() });
+  saveHistory(hist);
 }
 
 
@@ -1920,6 +2257,7 @@ function switchTab(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
   if (id === 'tournament') renderTournament();
   if (id === 'collection') renderCollection();
+  if (id === 'insights') renderInsights();
 }
 
 /* ════ TOURNAMENT RENDERING ════ */
@@ -2343,6 +2681,21 @@ function selectMatchChoice(i) {
   }
   matchState.playerScore += payout;
 
+  // Log to history for the Insights tab
+  logAnswer({
+    qId: q.obj,
+    quiz: 'tournament',
+    chapter: q.ch,
+    correct: correct,
+    wager: wager,
+    qText: q.q,
+    choices: q.choices,
+    correctIdx: q.ans,
+    selectedIdx: i,
+    explain: q.explain || '',
+    rivalId: matchState.rival.id,
+  });
+
   // Reveal rival's outcome for THIS question
   const rivalQ = matchState.rivalRun[matchState.qIndex];
   matchState.rivalScore += rivalQ.payout;
@@ -2744,6 +3097,328 @@ function closeBoxOpen() {
   } else {
     refreshHubExtras();
   }
+}
+
+/* ════ INSIGHTS ════ */
+let missesFilter = 'all';        // 'all', 'chem101', 'lab', or chapter number
+let expandedChapter = null;       // which chapter row is expanded in the heatmap
+
+function renderInsights() {
+  const hist = loadHistory();
+  // Filter out short-answer for accuracy stats — they aren't graded
+  const graded = hist.filter(r => !r.isShortAnswer);
+
+  const wrap = document.getElementById('panel-insights');
+
+  if (graded.length === 0) {
+    document.getElementById('insightsStats').innerHTML = '';
+    document.getElementById('heatmap').innerHTML = `
+      <div class="insights-empty">
+        <div class="empty-icon">📊</div>
+        <b style="color:var(--text);font-size:15px;">No data yet</b>
+        <div style="margin-top:6px;">Play the CHEM 101 quiz, the lab review, or a tournament match to start tracking your weak spots and recent misses.</div>
+      </div>`;
+    document.getElementById('missesList').innerHTML = '';
+    document.getElementById('missesFilterRow').innerHTML = '';
+    return;
+  }
+
+  // ── Top stats ──
+  const total = graded.length;
+  const correct = graded.filter(r => r.correct).length;
+  const accuracy = Math.round(correct / total * 100);
+
+  // Per-chapter performance for finding weakest/strongest
+  const chapterAcc = computeChapterAccuracy(graded);
+  let weakest = null, strongest = null;
+  Object.entries(chapterAcc).forEach(([ch, v]) => {
+    if (v.attempts >= 3) { // require min sample to call out
+      if (weakest === null || v.acc < chapterAcc[weakest].acc) weakest = ch;
+      if (strongest === null || v.acc > chapterAcc[strongest].acc) strongest = ch;
+    }
+  });
+
+  const last7Days = graded.filter(r => Date.now() - r.ts < 7 * 24 * 60 * 60 * 1000);
+  const last7Acc = last7Days.length === 0 ? null : Math.round(last7Days.filter(r => r.correct).length / last7Days.length * 100);
+
+  // Count "still missing" — questions whose latest attempt was wrong
+  const stillMissing = computeStillMissing(graded).length;
+
+  document.getElementById('insightsStats').innerHTML = `
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v ${accuracy >= 75 ? 'big-good' : accuracy < 55 ? 'big-bad' : ''}">${accuracy}%</div>
+      <div class="ins-stat-l">Accuracy (all)</div>
+    </div>
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v">${total}</div>
+      <div class="ins-stat-l">Questions logged</div>
+    </div>
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v ${last7Acc === null ? '' : last7Acc >= 75 ? 'big-good' : last7Acc < 55 ? 'big-bad' : ''}">${last7Acc === null ? '—' : last7Acc + '%'}</div>
+      <div class="ins-stat-l">Last 7 days</div>
+    </div>
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v big-bad">${stillMissing}</div>
+      <div class="ins-stat-l">Still missing</div>
+    </div>
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v" style="font-size:1.05rem;">${weakest ? chapterLabel(weakest) : '—'}</div>
+      <div class="ins-stat-l">Weakest area</div>
+    </div>
+    <div class="ins-stat-cell">
+      <div class="ins-stat-v" style="font-size:1.05rem;">${strongest ? chapterLabel(strongest) : '—'}</div>
+      <div class="ins-stat-l">Strongest area</div>
+    </div>
+  `;
+
+  // ── Heatmap ──
+  renderHeatmap(graded, chapterAcc);
+
+  // ── Misses list ──
+  renderMissesFilter(hist);
+  renderMissesList(hist);
+}
+
+function computeChapterAccuracy(graded) {
+  const acc = {};
+  graded.forEach(r => {
+    const key = String(r.chapter);
+    if (!acc[key]) acc[key] = { attempts: 0, correct: 0, acc: 0 };
+    acc[key].attempts++;
+    if (r.correct) acc[key].correct++;
+  });
+  Object.values(acc).forEach(v => v.acc = v.attempts === 0 ? 0 : v.correct / v.attempts);
+  return acc;
+}
+
+function computeObjectiveAccuracy(graded, chapter) {
+  const acc = {};
+  graded.filter(r => String(r.chapter) === String(chapter)).forEach(r => {
+    const key = r.qId;
+    if (!acc[key]) acc[key] = { attempts: 0, correct: 0, acc: 0, qText: r.qText };
+    acc[key].attempts++;
+    if (r.correct) acc[key].correct++;
+  });
+  Object.values(acc).forEach(v => v.acc = v.attempts === 0 ? 0 : v.correct / v.attempts);
+  return acc;
+}
+
+function chapterLabel(ch) {
+  if (ch === 'lab') return 'Lab';
+  const c = CHAPTERS.find(x => x.id === parseInt(ch, 10));
+  return c ? `Ch ${c.id}` : 'Ch ?';
+}
+
+function chapterFullName(ch) {
+  if (ch === 'lab') return 'Lab Review';
+  const c = CHAPTERS.find(x => x.id === parseInt(ch, 10));
+  return c ? c.name : 'Unknown';
+}
+
+function renderHeatmap(graded, chapterAcc) {
+  // Build rows: chapters 1-9 + lab
+  const rows = [];
+  for (let i = 1; i <= 9; i++) rows.push({ key: String(i), label: `Ch ${i} · ${CHAPTERS.find(c => c.id === i)?.name || ''}` });
+  rows.push({ key: 'lab', label: 'Lab Review' });
+
+  const html = rows.map(row => {
+    const a = chapterAcc[row.key];
+    const expanded = expandedChapter === row.key;
+    if (!a || a.attempts === 0) {
+      return `<div class="heatmap-row no-data">
+        <div class="hm-label"><span class="hm-ch-tag">${chapterLabel(row.key)}</span>${chapterFullName(row.key)}</div>
+        <div class="hm-bar-track"></div>
+        <div class="hm-pct" style="color:var(--muted);">—</div>
+        <div class="hm-attempts">0</div>
+      </div>`;
+    }
+    const pct = Math.round(a.acc * 100);
+    const cls = pct >= 75 ? 'strong' : pct < 55 ? 'weak' : 'medium';
+    return `
+      <div class="heatmap-row ${expanded ? 'expanded' : ''}" onclick="toggleHeatmapRow('${row.key}')">
+        <div class="hm-label"><span class="hm-ch-tag">${chapterLabel(row.key)}</span>${chapterFullName(row.key)}</div>
+        <div class="hm-bar-track"><div class="hm-bar-fill" style="width:${pct}%"></div></div>
+        <div class="hm-pct ${cls}">${pct}%</div>
+        <div class="hm-attempts">${a.correct}/${a.attempts}</div>
+      </div>
+      <div class="objective-list ${expanded ? 'show' : ''}" id="objList-${row.key}">
+        ${expanded ? renderObjectiveList(graded, row.key) : ''}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('heatmap').innerHTML = html;
+}
+
+function renderObjectiveList(graded, chapter) {
+  const objAcc = computeObjectiveAccuracy(graded, chapter);
+  const entries = Object.entries(objAcc).sort((a, b) => a[0].localeCompare(b[0]));
+  if (entries.length === 0) {
+    return `<div style="color:var(--muted);font-size:12px;padding:6px;">No per-objective data yet.</div>`;
+  }
+  return entries.map(([id, v]) => {
+    const pct = Math.round(v.acc * 100);
+    const cls = pct >= 75 ? 'strong' : pct < 55 ? 'weak' : 'medium';
+    // Truncate question text
+    const short = (v.qText || '').slice(0, 70).replace(/</g, '&lt;') + ((v.qText || '').length > 70 ? '…' : '');
+    return `
+      <div class="obj-row">
+        <div class="or-id">${id}</div>
+        <div>
+          <div style="color:var(--text);font-size:12px;line-height:1.4;margin-bottom:3px;">${short}</div>
+          <div class="or-bar"><div class="or-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="or-pct ${cls}">${pct}%</div>
+        <div class="or-att">${v.correct}/${v.attempts}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleHeatmapRow(key) {
+  expandedChapter = expandedChapter === key ? null : key;
+  // Re-render only the heatmap to keep state
+  const hist = loadHistory().filter(r => !r.isShortAnswer);
+  if (hist.length === 0) return;
+  renderHeatmap(hist, computeChapterAccuracy(hist));
+}
+
+function computeStillMissing(graded) {
+  // For each unique qId, find the most recent attempt. If wrong, include.
+  const latest = {};
+  // graded is appended chronologically (push), so iterate in reverse to get latest first
+  for (let i = graded.length - 1; i >= 0; i--) {
+    const r = graded[i];
+    if (!latest[r.qId]) latest[r.qId] = r;
+  }
+  return Object.values(latest).filter(r => !r.correct);
+}
+
+function renderMissesFilter(history) {
+  const stillMissing = computeStillMissing(history.filter(r => !r.isShortAnswer));
+  const counts = { all: stillMissing.length };
+  stillMissing.forEach(r => {
+    counts[r.quiz] = (counts[r.quiz] || 0) + 1;
+    counts['ch_' + r.chapter] = (counts['ch_' + r.chapter] || 0) + 1;
+  });
+
+  const buttons = [
+    { key: 'all', label: 'All' },
+    { key: 'chem101', label: 'CHEM 101' },
+    { key: 'tournament', label: 'Tournament' },
+    { key: 'lab', label: 'Lab' },
+  ];
+
+  document.getElementById('missesFilterRow').innerHTML = buttons.map(b => `
+    <button class="filter-btn ${missesFilter === b.key ? 'active' : ''}" onclick="setMissesFilter('${b.key}')">
+      ${b.label} <span style="opacity:0.6;">${counts[b.key] || 0}</span>
+    </button>
+  `).join('');
+}
+
+function setMissesFilter(f) {
+  missesFilter = f;
+  const hist = loadHistory();
+  renderMissesFilter(hist);
+  renderMissesList(hist);
+}
+
+function renderMissesList(history) {
+  const missing = computeStillMissing(history.filter(r => !r.isShortAnswer));
+  const filtered = missesFilter === 'all'
+    ? missing
+    : missing.filter(r => r.quiz === missesFilter);
+  // Sort by ts desc
+  filtered.sort((a, b) => b.ts - a.ts);
+
+  if (filtered.length === 0) {
+    const empty = missing.length === 0
+      ? `<b style="color:#4ade80;font-size:15px;">🎉 No outstanding misses!</b><div style="margin-top:6px;">Every question you've recently attempted, you've gotten right on the latest try.</div>`
+      : `<b style="color:var(--text);font-size:15px;">No misses in this filter</b><div style="margin-top:6px;">Try a different filter above.</div>`;
+    document.getElementById('missesList').innerHTML = `<div class="insights-empty">${empty}</div>`;
+    return;
+  }
+
+  // Cap at 30 to keep DOM light
+  const shown = filtered.slice(0, 30);
+  const truncated = filtered.length - shown.length;
+
+  document.getElementById('missesList').innerHTML = shown.map(r => renderMissCard(r)).join('') + (truncated > 0
+    ? `<div style="text-align:center;color:var(--muted);font-size:12px;padding:1rem;">Showing 30 of ${filtered.length}. Get some right to clear them.</div>`
+    : '');
+}
+
+function renderMissCard(r) {
+  const tagClass = r.quiz;
+  const tagLabel = r.quiz === 'chem101' ? 'CHEM 101'
+                 : r.quiz === 'lab' ? 'Lab'
+                 : r.quiz === 'tournament' ? 'Tournament'
+                 : r.quiz;
+  const chTag = chapterLabel(r.chapter) + (r.qId ? ' · ' + r.qId : '');
+  const time = formatRelativeTime(r.ts);
+  const letters = ['A','B','C','D','E','F'];
+
+  let choicesHTML = '';
+  if (r.choices && r.choices.length > 0) {
+    if (r.multi && Array.isArray(r.correctSet)) {
+      // Lab multi-select: show all options, mark correct set + selected set
+      const correctSet = new Set(r.correctSet);
+      const selectedSet = new Set(r.selectedSet || []);
+      choicesHTML = '<div class="miss-choices">' + r.choices.map((c, i) => {
+        let cls = '';
+        if (correctSet.has(i)) cls = 'correct';
+        else if (selectedSet.has(i)) cls = 'your-pick';
+        return `<div class="miss-choice ${cls}"><span class="mc-letter">${letters[i]}</span><span>${escapeHtml(c)}${selectedSet.has(i) && !correctSet.has(i) ? ' <span style="font-size:10px;opacity:0.7;">← your pick</span>' : ''}${correctSet.has(i) && !selectedSet.has(i) ? ' <span style="font-size:10px;opacity:0.7;">← correct</span>' : ''}${correctSet.has(i) && selectedSet.has(i) ? ' <span style="font-size:10px;opacity:0.7;">✓ correct, picked</span>' : ''}</span></div>`;
+      }).join('') + '</div>';
+    } else {
+      choicesHTML = '<div class="miss-choices">' + r.choices.map((c, i) => {
+        let cls = '';
+        if (i === r.correctIdx) cls = 'correct';
+        if (i === r.selectedIdx && i !== r.correctIdx) cls = 'your-pick';
+        const tagText = i === r.correctIdx
+          ? (i === r.selectedIdx ? '✓' : '← correct answer')
+          : (i === r.selectedIdx ? '← your pick' : '');
+        return `<div class="miss-choice ${cls}"><span class="mc-letter">${letters[i]}</span><span>${escapeHtml(c)}${tagText ? ' <span style="font-size:10px;opacity:0.7;">' + tagText + '</span>' : ''}</span></div>`;
+      }).join('') + '</div>';
+    }
+  }
+
+  const explainHTML = r.explain
+    ? `<div class="miss-explain"><b>Explanation</b>${r.explain}</div>`
+    : '';
+
+  return `
+    <div class="miss-card">
+      <div class="miss-head">
+        <span class="miss-tag ${tagClass}">${tagLabel}</span>
+        <span class="miss-tag" style="color:var(--muted);border-color:var(--border);background:var(--bg);">${chTag}</span>
+        <span class="miss-time">${time}</span>
+      </div>
+      <div class="miss-q">${escapeHtml(r.qText || '')}</div>
+      ${choicesHTML}
+      ${explainHTML}
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  // Don't escape — chemistry questions have intentional HTML like <sub>, <sup>
+  // But we DO want to be safe with user-controlled text. Question text is from our own banks, so trust.
+  return s;
+}
+
+function formatRelativeTime(ts) {
+  const delta = Date.now() - ts;
+  const mins = Math.floor(delta / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const d = new Date(ts);
+  return `${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 }
 
 /* ════ INIT ════ */

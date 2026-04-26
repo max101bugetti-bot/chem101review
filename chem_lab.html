@@ -907,6 +907,24 @@ function submitMC() {
   answered++;
   catScores[q.cat] && catScores[q.cat].a++;
   updateStats();
+
+  // Log to history for the Insights tab
+  logAnswer({
+    qId: 'lab-' + (q.q || '').slice(0, 50),
+    quiz: 'lab',
+    chapter: 'lab',
+    category: q.cat,
+    correct: isRight,
+    wager: wager,
+    qText: q.q,
+    choices: q.opts || [],
+    correctIdx: (q.correct && q.correct.length === 1) ? q.correct[0] : -1,
+    correctSet: q.correct,
+    selectedSet: [...selectedOpts],
+    multi: !!q.multi,
+    explain: q.explain || '',
+  });
+
   document.getElementById('feedback').innerHTML = `
     <div class="feedback ${isRight ? 'correct' : 'wrong'}">
       <div class="fb-label">${isRight ? '✓ Correct' : '✗ Incorrect'}${payoutNote}</div>
@@ -927,6 +945,22 @@ function revealAnswer() {
   state.questionsAnswered = (state.questionsAnswered || 0) + 1;
   addCoins(SHORT_ANSWER_REWARD);
   sessionCoinsWon += SHORT_ANSWER_REWARD;
+
+  // Log short-answer reveal as a "participation" attempt — counts as correct since they engaged
+  logAnswer({
+    qId: 'lab-sa-' + (q.q || '').slice(0, 50),
+    quiz: 'lab',
+    chapter: 'lab',
+    category: q.cat,
+    correct: true,           // participation = "correct" for now (no autograding)
+    wager: 0,
+    qText: q.q,
+    choices: [],
+    correctIdx: -1,
+    selectedIdx: -1,
+    explain: q.answer || '',
+    isShortAnswer: true,
+  });
 
   updateStats();
   document.getElementById('feedback').innerHTML = `
@@ -1180,6 +1214,34 @@ function toggleSound() {
     el.textContent = soundOn ? '🔊' : '🔇';
   });
   if (soundOn) initAudio().then(() => playCoin({ volume: 0.35 }));
+}
+
+/* ════ QUESTION HISTORY ════ */
+const HISTORY_KEY = 'chem101_history_v1';
+const HISTORY_CAP = 2000;
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveHistory(hist) {
+  try {
+    if (hist.length > HISTORY_CAP) hist = hist.slice(hist.length - HISTORY_CAP);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+  } catch (e) { /* quota — silent */ }
+}
+
+function logAnswer(record) {
+  const hist = loadHistory();
+  hist.push({ ...record, ts: Date.now() });
+  saveHistory(hist);
 }
 
 

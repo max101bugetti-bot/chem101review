@@ -1165,6 +1165,21 @@ function choose(i) {
 
     currentStreak = 0;
   }
+
+  // Log this attempt to history for the Insights tab
+  logAnswer({
+    qId: q.obj,
+    quiz: 'chem101',
+    chapter: q.ch,
+    correct: i === q.ans,
+    wager: wager,
+    qText: q.q,
+    choices: q.choices,
+    correctIdx: q.ans,
+    selectedIdx: i,
+    explain: q.explain || '',
+  });
+
   refreshStreakPill();
   document.getElementById('next-btn').style.display = 'inline-block';
 }
@@ -1452,6 +1467,34 @@ function toggleSound() {
     el.textContent = soundOn ? '🔊' : '🔇';
   });
   if (soundOn) initAudio().then(() => playCoin({ volume: 0.35 }));
+}
+
+/* ════ QUESTION HISTORY ════ */
+const HISTORY_KEY = 'chem101_history_v1';
+const HISTORY_CAP = 2000;
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveHistory(hist) {
+  try {
+    if (hist.length > HISTORY_CAP) hist = hist.slice(hist.length - HISTORY_CAP);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+  } catch (e) { /* quota — silent */ }
+}
+
+function logAnswer(record) {
+  const hist = loadHistory();
+  hist.push({ ...record, ts: Date.now() });
+  saveHistory(hist);
 }
 
 
